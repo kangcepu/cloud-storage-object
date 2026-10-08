@@ -1,0 +1,18 @@
+[Unit]
+Description=Cloud Storage API
+After=network.target
+
+[Service]
+Type=simple
+User=cloudstorage
+Group=cloudstorage
+WorkingDirectory=/opt/cloud-storage
+EnvironmentFile=/opt/cloud-storage/.env
+ExecStart=/usr/bin/node /opt/cloud-storage/dist/main.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

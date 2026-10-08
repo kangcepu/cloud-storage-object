@@ -140,10 +140,10 @@ export class RawPreviewService {
     resize: string,
     quality: string,
   ): Promise<void> {
-    const command = this.imageMagickBinary();
+    const runtime = this.imageMagickRuntime();
     const input = await this.imageMagickInput(source);
     const processHandle = spawn(
-      command,
+      runtime.command,
       [
         '-limit',
         'memory',
@@ -171,14 +171,14 @@ export class RawPreviewService {
         windowsHide: true,
         env: {
           ...process.env,
-          MAGICK_CONFIGURE_PATH: this.imageMagickConfigDirectory(),
+          ...(runtime.configurePath ? { MAGICK_CONFIGURE_PATH: runtime.configurePath } : {}),
           MAGICK_TEMPORARY_PATH: dirname(output),
         },
       },
     );
     const errors: Buffer[] = [];
     processHandle.stderr.on('data', (value: Buffer) => errors.push(value));
-    const code = await this.waitProcess(processHandle, command);
+    const code = await this.waitProcess(processHandle, runtime.command);
     if (code !== 0) {
       throw new Error(Buffer.concat(errors).toString('utf8').trim().slice(0, 500) || `Exit code ${code}`);
     }
@@ -213,23 +213,28 @@ export class RawPreviewService {
     return resolve(__dirname, '..', '..', 'tools', 'imagemagick-portable');
   }
 
-  private imageMagickConfigDirectory(): string {
-    return resolve(__dirname, '..', '..', 'tools', 'imagemagick-config');
-  }
-
-  private imageMagickBinary(): string {
+  private imageMagickRuntime(): { command: string; configurePath?: string } {
     const configured = process.env.IMAGE_MAGICK_BIN?.trim();
     if (configured) {
-      return configured;
+      return {
+        command: configured,
+        configurePath: process.env.IMAGE_MAGICK_CONFIG_PATH?.trim() || undefined,
+      };
     }
     const bundled = resolve(
       this.imageMagickDirectory(),
       process.platform === 'win32' ? 'magick.exe' : 'magick',
     );
     if (existsSync(bundled)) {
-      return bundled;
+      const bundledConfig = resolve(__dirname, '..', '..', 'tools', 'imagemagick-config');
+      return {
+        command: bundled,
+        configurePath: existsSync(bundledConfig) ? bundledConfig : undefined,
+      };
     }
-    return process.platform === 'win32' ? 'magick.exe' : 'magick';
+    // Leave MAGICK_CONFIGURE_PATH untouched for system ImageMagick. Linux distributions
+    // commonly provide RAW/LibRaw delegates through their own configuration directory.
+    return { command: process.platform === 'win32' ? 'magick.exe' : 'magick' };
   }
 
   private waitProcess(processHandle: ReturnType<typeof spawn>, command: string): Promise<number> {
@@ -246,7 +251,13 @@ export class RawPreviewService {
         processHandle.kill();
         complete(new Error('Konversi melewati batas waktu 120 detik.'));
       }, 120_000);
-      processHandle.once('error', (error) => complete(new Error(`${command}: ${error.message}`)));
+      processHandle.once('error', (error) => {
+        const hint =
+          (error as NodeJS.ErrnoException).code === 'ENOENT'
+            ? ' Install ImageMagick with RAW/LibRaw support, or set IMAGE_MAGICK_BIN.'
+            : '';
+        complete(new Error(`${command}: ${error.message}.${hint}`));
+      });
       processHandle.once('close', (code) => complete(null, code ?? -1));
     });
   }

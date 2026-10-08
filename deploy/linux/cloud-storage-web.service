@@ -1,0 +1,18 @@
+[Unit]
+Description=Cloud Storage Web
+After=network.target cloud-storage-api.service
+
+[Service]
+Type=simple
+User=cloudstorage
+Group=cloudstorage
+WorkingDirectory=/opt/cloud-storage/frontend
+EnvironmentFile=/opt/cloud-storage/frontend/.env.local
+ExecStart=/usr/bin/node /opt/cloud-storage/frontend/node_modules/next/dist/bin/next start -p 3001
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

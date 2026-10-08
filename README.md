@@ -5,9 +5,9 @@ Backend NestJS dan frontend Next.js untuk database dan MinIO Enterprise S3 Stora
 ## Menjalankan backend
 
 ```powershell
-cmd /c npm install
-cmd /c npm run build
-cmd /c npm run start
+npm ci
+npm run build
+npm run start
 ```
 
 Konfigurasi runtime dibaca dari `.env`. File `.env.example` berisi daftar variable yang dibutuhkan tanpa credential produksi.
@@ -17,11 +17,11 @@ Backend berjalan pada `http://localhost:3000`.
 ## Menjalankan frontend
 
 ```powershell
-cd C:\web\cloud\frontend
-Copy-Item .env.example .env.local
-cmd /c npm install
-cmd /c npm run build
-cmd /c npm run dev
+cd frontend
+Copy-Item .env.example .env.local # PowerShell di Windows
+npm ci
+npm run build
+npm run dev
 ```
 
 Frontend berjalan pada `http://localhost:3001`. Request `/api` dan `/media` diteruskan oleh Next.js ke backend sesuai `BACKEND_URL`.
@@ -30,7 +30,13 @@ Frontend mencakup login, home, drive, bucket dan permission, users, settings, pr
 
 ## Preview file RAW
 
-Backend otomatis menggunakan ImageMagick portable pada `tools\imagemagick-portable\magick.exe`. Binary tersebut membawa LibRaw dan tidak membutuhkan instalasi `dcraw` atau perubahan PATH Windows. Variable `IMAGE_MAGICK_BIN` dapat diisi untuk memakai binary lain.
+Preview RAW (CR2, CR3, NEF, ARW, DNG, RAF, RW2, ORF, SRW, PEF, 3FR, SR2, dan MRW) memakai ImageMagick dengan dukungan RAW/LibRaw.
+
+- **Windows:** aplikasi otomatis memakai `tools\imagemagick-portable\magick.exe` yang disertakan dalam repository. Binary ini membawa LibRaw, sehingga tidak perlu memasang `dcraw` atau mengubah `PATH`.
+- **Linux:** aplikasi memakai perintah `magick` dari `PATH`, sehingga instal ImageMagick yang memiliki delegate `raw`/LibRaw. Konfigurasi ImageMagick bawaan sistem tidak lagi ditimpa oleh konfigurasi portable Windows.
+- **Override:** isi `IMAGE_MAGICK_BIN` dengan path executable ImageMagick. Bila binary membutuhkan folder konfigurasi sendiri, isi juga `IMAGE_MAGICK_CONFIG_PATH`.
+
+Lihat [panduan deployment Windows dan Linux](docs/deployment.md) untuk service production, variabel environment, serta pemeriksaan dukungan RAW.
 
 ## Endpoint utama
 
