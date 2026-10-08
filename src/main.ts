@@ -49,7 +49,7 @@ async function bootstrap(): Promise<void> {
   );
   app.useGlobalFilters(new HttpExceptionFilter());
   app.enableShutdownHooks();
-  await app.listen(Number(config.get<string>('PORT', '3000')), '0.0.0.0');
+  await app.listen(Number(config.get<string>('PORT', '6000')), '0.0.0.0');
 }
 
 void bootstrap();

@@ -16,5 +16,5 @@ if ($Target -eq 'api') {
 } else {
   $frontendRoot = Join-Path $ApplicationRoot 'frontend'
   Set-Location $frontendRoot
-  & $NodePath (Join-Path $frontendRoot 'node_modules\next\dist\bin\next') 'start' '-p' '3001'
+  & $NodePath (Join-Path $frontendRoot 'node_modules\next\dist\bin\next') 'start' '-p' '6001'
 }

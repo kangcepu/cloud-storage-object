@@ -17,7 +17,7 @@ RUN apt-get update \
 
 WORKDIR /app
 ENV NODE_ENV=production \
-    PORT=3000 \
+    PORT=6000 \
     STORAGE_PATH=/var/lib/cloud-storage \
     IMAGE_MAGICK_BIN=convert
 
@@ -29,6 +29,6 @@ RUN mkdir -p /var/lib/cloud-storage \
   && chown -R node:node /app /var/lib/cloud-storage
 
 USER node
-EXPOSE 3000
+EXPOSE 6000
 
 CMD ["node", "dist/main.js"]

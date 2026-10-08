@@ -36,7 +36,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now cloud-storage-api cloud-storage-web
 ```
 
-Sesuaikan `WorkingDirectory`, `ExecStart`, dan `EnvironmentFile` pada kedua unit bila lokasi aplikasi berbeda. Pastikan `.env` hanya dapat dibaca user `cloudstorage`. Letakkan reverse proxy TLS (misalnya Nginx atau Caddy) di depan port API `3000` dan frontend `3001`, lalu set `SESSION_SECURE=true`, `PUBLIC_BASE_URL`, dan `CORS_ORIGINS` ke URL HTTPS final.
+Sesuaikan `WorkingDirectory`, `ExecStart`, dan `EnvironmentFile` pada kedua unit bila lokasi aplikasi berbeda. Pastikan `.env` hanya dapat dibaca user `cloudstorage`. Letakkan reverse proxy TLS (misalnya Nginx atau Caddy) di depan port API `6000` dan frontend `6001`, lalu set `SESSION_SECURE=true`, `PUBLIC_BASE_URL`, dan `CORS_ORIGINS` ke URL HTTPS final.
 
 Gunakan `journalctl -u cloud-storage-api -f` untuk memantau API. Jika preview RAW gagal, periksa `magick -version` dari user `cloudstorage`.
 
@@ -57,7 +57,7 @@ Untuk menghapus layanan:
 .\deploy\windows\uninstall-services.ps1
 ```
 
-Tempatkan IIS, Caddy, atau reverse proxy TLS lain di depan port 3000 dan 3001; aktifkan `SESSION_SECURE=true` setelah HTTPS digunakan.
+Tempatkan IIS, Caddy, atau reverse proxy TLS lain di depan port 6000 dan 6001; aktifkan `SESSION_SECURE=true` setelah HTTPS digunakan.
 
 ## PM2 (Windows atau Linux)
 
@@ -71,7 +71,7 @@ pm2 start ecosystem.config.cjs --env production
 pm2 save
 ```
 
-Konfigurasi [ecosystem.config.cjs](../ecosystem.config.cjs) menjalankan API pada port `3000` dan frontend pada port `3001`, serta melakukan restart otomatis saat proses gagal. Pada Linux, aktifkan pemulihan otomatis setelah reboot dengan `pm2 startup` lalu jalankan perintah yang dicetak PM2. Pada Windows, gunakan Windows Service yang telah disediakan di atas untuk pemulihan setelah reboot, atau buat Scheduled Task yang menjalankan `pm2 resurrect` saat startup.
+Konfigurasi [ecosystem.config.cjs](../ecosystem.config.cjs) menjalankan API pada port `6000` dan frontend pada port `6001`, serta melakukan restart otomatis saat proses gagal. Pada Linux, aktifkan pemulihan otomatis setelah reboot dengan `pm2 startup` lalu jalankan perintah yang dicetak PM2. Pada Windows, gunakan Windows Service yang telah disediakan di atas untuk pemulihan setelah reboot, atau buat Scheduled Task yang menjalankan `pm2 resurrect` saat startup.
 
 Gunakan `pm2 logs`, `pm2 status`, dan `pm2 reload ecosystem.config.cjs --env production` untuk monitoring dan rollout ulang.
 
@@ -87,6 +87,6 @@ docker compose ps
 docker compose logs -f api
 ```
 
-Frontend container meneruskan `/api` dan `/media` ke service `api` internal; akses host tersedia pada `http://localhost:3001`, sedangkan API tersedia pada port `3000`. Untuk deploy ulang gunakan `docker compose up --build -d`; untuk menghentikan service gunakan `docker compose down`. Named volume tidak dihapus oleh `down`, tetapi akan dihapus oleh `docker compose down --volumes`.
+Frontend container meneruskan `/api` dan `/media` ke service `api` internal; akses host tersedia pada `http://localhost:6001`, sedangkan API tersedia pada port `6000`. Untuk deploy ulang gunakan `docker compose up --build -d`; untuk menghentikan service gunakan `docker compose down`. Named volume tidak dihapus oleh `down`, tetapi akan dihapus oleh `docker compose down --volumes`.
 
 Pada Windows gunakan Docker yang berjalan dalam mode Linux containers. Untuk PowerShell, buat konfigurasi awal dengan `Copy-Item .env.example .env` sebelum menjalankan `docker compose up --build -d`.

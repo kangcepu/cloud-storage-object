@@ -13,14 +13,14 @@ module.exports = {
       kill_timeout: 10000,
       env_production: {
         NODE_ENV: 'production',
-        PORT: 3000,
+        PORT: 6000,
       },
     },
     {
       name: 'cloud-storage-web',
       cwd: path.join(__dirname, 'frontend'),
       script: 'node_modules/next/dist/bin/next',
-      args: 'start -p 3001',
+      args: 'start -p 6001',
       interpreter: 'node',
       instances: 1,
       autorestart: true,
@@ -28,7 +28,7 @@ module.exports = {
       kill_timeout: 10000,
       env_production: {
         NODE_ENV: 'production',
-        PORT: 3001,
+        PORT: 6001,
       },
     },
   ],

@@ -8,6 +8,7 @@ User=cloudstorage
 Group=cloudstorage
 WorkingDirectory=/opt/cloud-storage
 EnvironmentFile=/opt/cloud-storage/.env
+Environment=PORT=6000
 ExecStart=/usr/bin/node /opt/cloud-storage/dist/main.js
 Restart=on-failure
 RestartSec=5

@@ -12,7 +12,7 @@ npm run start
 
 Konfigurasi runtime dibaca dari `.env`. File `.env.example` berisi daftar variable yang dibutuhkan tanpa credential produksi.
 
-Backend berjalan pada `http://localhost:3000`.
+Backend berjalan pada `http://localhost:6000`.
 
 ## Menjalankan frontend
 
@@ -24,7 +24,7 @@ npm run build
 npm run dev
 ```
 
-Frontend berjalan pada `http://localhost:3001`. Request `/api` dan `/media` diteruskan oleh Next.js ke backend sesuai `BACKEND_URL`.
+Frontend berjalan pada `http://localhost:6001`. Request `/api` dan `/media` diteruskan oleh Next.js ke backend sesuai `BACKEND_URL`.
 
 Frontend mencakup login, home, drive, bucket dan permission, users, settings, profile, serta seluruh operasi file yang tersedia di REST API.
 
