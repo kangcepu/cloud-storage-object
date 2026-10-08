@@ -1,0 +1,12 @@
+.git
+.impeccable
+node_modules
+frontend/node_modules
+dist
+frontend/.next
+storage
+.env
+frontend/.env.local
+coverage
+*.log
+*.tsbuildinfo

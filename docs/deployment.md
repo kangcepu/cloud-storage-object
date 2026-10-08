@@ -58,3 +58,35 @@ Untuk menghapus layanan:
 ```
 
 Tempatkan IIS, Caddy, atau reverse proxy TLS lain di depan port 3000 dan 3001; aktifkan `SESSION_SECURE=true` setelah HTTPS digunakan.
+
+## PM2 (Windows atau Linux)
+
+PM2 menjalankan hasil build; proses build tetap menggunakan npm. Setelah `.env` API dan `frontend/.env.local` sudah dikonfigurasi, jalankan dari root project:
+
+```sh
+npm ci && npm run build
+cd frontend && npm ci && npm run build && cd ..
+npm install --global pm2
+pm2 start ecosystem.config.cjs --env production
+pm2 save
+```
+
+Konfigurasi [ecosystem.config.cjs](../ecosystem.config.cjs) menjalankan API pada port `3000` dan frontend pada port `3001`, serta melakukan restart otomatis saat proses gagal. Pada Linux, aktifkan pemulihan otomatis setelah reboot dengan `pm2 startup` lalu jalankan perintah yang dicetak PM2. Pada Windows, gunakan Windows Service yang telah disediakan di atas untuk pemulihan setelah reboot, atau buat Scheduled Task yang menjalankan `pm2 resurrect` saat startup.
+
+Gunakan `pm2 logs`, `pm2 status`, dan `pm2 reload ecosystem.config.cjs --env production` untuk monitoring dan rollout ulang.
+
+## Docker Compose (Linux atau Windows dengan Linux containers)
+
+Docker build mencakup ImageMagick untuk preview RAW dan menyimpan cache/temporary preview ke named volume `cloud-storage-data`. Siapkan `.env` dari `.env.example`, lalu untuk Docker set setidaknya `STORAGE_PATH=/var/lib/cloud-storage`, URL CORS production, dan semua secret yang diperlukan.
+
+```sh
+cp .env.example .env
+# Edit .env: DB_*, APP_ENCRYPTION_KEY_BASE64, SESSION_SECRET, CORS_ORIGINS, dan PUBLIC_BASE_URL
+docker compose up --build -d
+docker compose ps
+docker compose logs -f api
+```
+
+Frontend container meneruskan `/api` dan `/media` ke service `api` internal; akses host tersedia pada `http://localhost:3001`, sedangkan API tersedia pada port `3000`. Untuk deploy ulang gunakan `docker compose up --build -d`; untuk menghentikan service gunakan `docker compose down`. Named volume tidak dihapus oleh `down`, tetapi akan dihapus oleh `docker compose down --volumes`.
+
+Pada Windows gunakan Docker yang berjalan dalam mode Linux containers. Untuk PowerShell, buat konfigurasi awal dengan `Copy-Item .env.example .env` sebelum menjalankan `docker compose up --build -d`.
